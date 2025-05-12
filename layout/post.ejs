@@ -1,0 +1,62 @@
+<div class="post-main">
+    <% if (is_post()) { %>
+        <div class="post-main-title">
+            <%= page.title %>
+        </div>
+        <div class="post-meta">
+            <%- date(page.date, "YYYY-MM-DD") %> ｜ 
+            <% page.tags.forEach(function(tag) { %>
+                <a href="<%= url_for(tag.path) %>"># <%= tag.name %></a>
+            <% }); %>
+        </div>
+        <!-- 圆角分类 -->
+        <!-- <div class="tags">
+            <% page.categories.forEach(function(category) { %>
+                <a href="<%= url_for(category.path) %>"><%= category.name %></a>
+            <% }); %>
+        </div> -->
+        <div class="post-content-wrapper">
+            <div class="post-md">
+                <%- page.content %>
+            </div>
+            <div class="post-toc">
+                <div class="toc-title">目录</div>
+                <div class="toc-content"></div>
+            </div>
+        </div>
+    <% } else { %>
+        <div class="post-md">
+            <%- page.content %>
+        </div>
+    <% } %>
+
+<!-- 只在文章页面显示分类和导航 -->
+<% if (is_post()) { %>
+    <!-- tags -->
+    <% if (page.tags && page.tags.length > 0) { %>
+        <div class="post-meta">
+            分类：
+            <% page.categories.forEach(function(category) { %>
+                            <a href="<%= url_for(category.path) %>"> / <%= category.name %></a>
+
+            <% }); %>
+        </div>
+    <% } %>
+
+    <!-- 添加上一篇和下一篇导航 -->
+    <div class="post-navigation">
+        <div class="post-nav-prev">
+            <% if (page.prev) { %>
+                <span class="nav-label">上一篇</span>
+                <a href="<%- url_for(page.prev.path) %>" class="nav-title"><%= page.prev.title %></a>
+            <% } %>
+        </div>
+        <div class="post-nav-next">
+            <% if (page.next) { %>
+                <span class="nav-label">下一篇</span>
+                <a href="<%- url_for(page.next.path) %>" class="nav-title"><%= page.next.title %></a>
+            <% } %>
+        </div>
+    </div>
+<% } %>
+</div>

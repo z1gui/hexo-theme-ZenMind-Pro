@@ -1,0 +1,65 @@
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport" />
+  <meta name="robots" content="index, follow">
+  <!-- title -->
+  <% if (page.total > 1){ %>
+    <% if (page.current === 1) { %>
+  <title><%= config.title %> - <%= config.subtitle %></title>
+    <% } else { %>
+  <title>第<%= page.current %>页 - <%= config.title %></title>
+    <% } %>
+  <% } else { %>
+    <% if (is_archive()) { %>
+  <title>所有文章 - <%= config.title %></title>
+    <% } else if (is_category()) { %>
+  <title><%= page.category %> - <%= config.title %></title>
+    <% } else if (is_tag()) { %>
+  <title><%= page.tag %> - <%= config.title %></title>
+    <% } else if (is_post()) { %>
+  <title><%= page.title %> - <%= config.title %></title>
+    <% } else if (page.path === 'index.html' || page.path === '') { %>
+  <title><%= config.title %> - <%= config.subtitle %></title>
+    <% } else { %>
+  <title><%= page.title %> - <%= config.title %></title>
+    <% } %>
+  <% } %>
+  
+  <!-- open graph -->
+  <%- open_graph() %>
+  <!-- canonical -->
+  <% if (page.path === 'index.html' || page.path === '') { %>
+  <link rel="canonical" href="<%= config.url %>">
+  <% } else if (page.path.endsWith('index.html')) { %>
+  <link rel="canonical" href="<%= config.url + '/' + page.path.replace('index.html', '') %>">
+  <% } else { %>
+  <link rel="canonical" href="<%= config.url + (page.path.startsWith('/') ? '' : '/') + page.path %>">
+  <% } %>
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="/img/favicon.png">
+  <!-- CSS -->
+  <%- css('css/reset.css') %>
+  <%- css('css/style.css') %>
+  <%- css('css/markdown.css') %>
+  <%- css('css/fonts.css') %>
+  
+  <!-- 图片懒加载 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const lazyImages = document.querySelectorAll('img[data-src]');
+      
+      const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const img = entry.target;
+            img.src = img.dataset.src;
+            img.removeAttribute('data-src');
+            observer.unobserve(img);
+          }
+        });
+      });
+
+      lazyImages.forEach(img => imageObserver.observe(img));
+    });
+  </script>
+</head>

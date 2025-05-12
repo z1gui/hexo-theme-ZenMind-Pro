@@ -1,0 +1,9 @@
+<div class="header">
+    <!-- <a class="logo" href="<%- url_for() %>"><%= config.title %></a> -->
+    <div class="logo"><a href="/" title="z1gui"><img src="/img/favicon.png" alt="z1gui" aria-label="logo" height="80"></a></div>
+    <ul class="nav">
+        <% for (name in theme.menu) { %>
+        <li><a href="<%- url_for(theme.menu[name]) %>"><%= name %></a></li>
+        <% } %>
+    </ul>
+</div>

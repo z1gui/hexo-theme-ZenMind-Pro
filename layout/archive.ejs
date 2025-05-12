@@ -1,0 +1,162 @@
+<div class="archive-container">
+    <div class="category-filter" style="display: none;">
+        <button class="category-btn active" data-category="all">全部(<%= site.posts.length %>)</button>
+        <% site.categories.sort('name').each(function(category){ %>
+            <button class="category-btn" data-category="<%= category.name %>"><%= category.name %> (<%= category.posts.length %>)</button>
+        <% }); %>
+    </div>
+    <div class="archive-content">
+        <div class="empty-state" style="display: none;">
+            <p>该分类下文章正在创作中，请过段时间再来看看~</p>
+        </div>
+        <% 
+        let postsByYear = {};
+        page.posts.each(function(post){
+            const year = date(post.date, 'YYYY');
+            if (!postsByYear[year]) {
+                postsByYear[year] = [];
+            }
+            postsByYear[year].push(post);
+        });
+        
+        Object.keys(postsByYear).sort().reverse().forEach(function(year) {
+        %>
+            <div class="archive-year" data-year="<%= year %>">
+                <h2 class="year-title"><%= year %></h2>
+                <div class="year-posts">
+                    <% postsByYear[year].forEach(function(post) { %>
+                        <article class="archive-item" data-categories="<%= post.categories.map(c => c.name).join(' ') %>" data-year="<%= year %>">
+                            <a href="<%- url_for(post.path) %>" class="archive-title"><%= post.title %></a>
+                            <div class="archive-meta">
+                                <time class="archive-date"><%= date(post.date, 'YYYY-MM-DD') %></time>
+                                <div class="archive-tags">
+                                    <% post.tags.forEach(function(tag) { %>
+                                        <a href="<%= url_for(tag.path) %>"># <%= tag.name %></a>
+                                    <% }); %>
+                                </div>
+                            </div>
+                        </article>
+                    <% }); %>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const categoryFilter = document.querySelector('.category-filter');
+    const categoryBtns = document.querySelectorAll('.category-btn');
+    const archiveItems = document.querySelectorAll('.archive-item');
+    const emptyState = document.querySelector('.empty-state');
+    const archiveContent = document.querySelector('.archive-content');
+
+    // 检查是否应该显示分类列表
+    function checkShouldShowCategoryFilter() {
+        const referrer = document.referrer;
+        const currentHost = window.location.host;
+        const currentPath = window.location.pathname;
+        
+        // 如果当前页面URL包含tags或categories，不显示分类列表
+        if (currentPath.includes('/tags/') || currentPath.includes('/categories/')) {
+            return false;
+        }
+        
+        // 如果是从其他页面进入，显示分类列表
+        if (referrer && referrer.includes(currentHost)) {
+            return true;
+        }
+        return false;
+    }
+
+    function updateDisplay() {
+        const selectedCategory = document.querySelector('.category-btn.active').dataset.category;
+        let hasVisibleItems = false;
+
+        // 根据选择的分类显示文章
+        if (selectedCategory === 'all') {
+            // 显示所有文章
+            archiveItems.forEach(item => {
+                item.style.display = 'flex';
+                hasVisibleItems = true;
+            });
+        } else {
+            // 先隐藏所有文章
+            archiveItems.forEach(item => {
+                item.style.display = 'none';
+            });
+
+            // 显示选中分类的文章
+            archiveItems.forEach(item => {
+                const categories = item.dataset.categories.split(' ');
+                if (categories.includes(selectedCategory)) {
+                    item.style.display = 'flex';
+                    hasVisibleItems = true;
+                }
+            });
+        }
+
+        // 更新年份标题的显示
+        const years = document.querySelectorAll('.archive-year');
+        years.forEach(year => {
+            const yearValue = year.dataset.year;
+            const yearPosts = document.querySelectorAll(`.archive-item[data-year="${yearValue}"]`);
+            const hasVisiblePosts = Array.from(yearPosts).some(post => post.style.display === 'flex');
+            
+            // 如果该年份下没有可见的文章，隐藏整个年份区块
+            year.style.display = hasVisiblePosts ? 'block' : 'none';
+        });
+
+        // 显示或隐藏空状态提示
+        if (!hasVisibleItems && selectedCategory !== 'all') {
+            emptyState.style.display = 'block';
+            archiveContent.style.display = 'none';
+        } else {
+            emptyState.style.display = 'none';
+            archiveContent.style.display = 'block';
+        }
+    }
+
+    // 为每个分类按钮添加点击事件
+    categoryBtns.forEach(function(btn) {
+        btn.onclick = function() {
+            // 移除所有按钮的active类
+            categoryBtns.forEach(function(b) {
+                b.classList.remove('active');
+            });
+            // 为当前点击的按钮添加active类
+            this.classList.add('active');
+            // 更新显示
+            updateDisplay();
+        };
+    });
+
+    // 检查URL中是否包含分类参数
+    function checkUrlForCategory() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const category = urlParams.get('category');
+        if (category) {
+            const decodedCategory = decodeURIComponent(category);
+            const targetBtn = Array.from(categoryBtns).find(btn => btn.dataset.category === decodedCategory);
+            if (targetBtn) {
+                // 显示分类列表
+                categoryFilter.style.display = 'flex';
+                // 移除所有按钮的active类
+                categoryBtns.forEach(function(b) {
+                    b.classList.remove('active');
+                });
+                // 激活目标按钮
+                targetBtn.classList.add('active');
+                // 更新显示
+                updateDisplay();
+            }
+        }
+    }
+
+    // 初始化显示
+    if (checkShouldShowCategoryFilter()) {
+        categoryFilter.style.display = 'flex';
+    }
+    checkUrlForCategory();
+});
+</script>
