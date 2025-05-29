@@ -60,3 +60,43 @@
     </div>
 <% } %>
 </div>
+
+<!-- 图片全屏显示模态框 -->
+<div class="image-modal" id="imageModal">
+    <img id="modalImage" src="" alt="全屏图片">
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    const postImages = document.querySelectorAll('.post-md img');
+
+    // 点击图片打开模态框
+    postImages.forEach(img => {
+        // 检查图片是否在社交链接中
+        const isSocialIcon = img.closest('.social-links') !== null;
+        if (!isSocialIcon) {
+            img.addEventListener('click', function() {
+                modal.classList.add('active');
+                modalImg.src = this.src;
+                document.body.style.overflow = 'hidden'; // 防止背景滚动
+            });
+        }
+    });
+
+    // 点击模态框关闭
+    modal.addEventListener('click', function() {
+        modal.classList.remove('active');
+        document.body.style.overflow = ''; // 恢复背景滚动
+    });
+
+    // 按 ESC 键关闭模态框
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+});
+</script>

@@ -49,7 +49,7 @@ a
 
 .header
 {
-    padding-bottom: 48px;
+    padding-bottom: 24px;
     margin-bottom: 48px;
     border-bottom: 1px solid var(--line-1);
     display: flex;
@@ -115,7 +115,7 @@ a
 
 .post-header
 {
-    margin-bottom: 48px;
+    margin-bottom: 24px;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -190,7 +190,7 @@ a
     left: 0;
     bottom: -2px;
     width: 0;
-    height: 2px;
+    height: 4px;
     background-color: var(--font-color-0);
     transition: width ease-in-out .3s;
 }
@@ -236,7 +236,6 @@ a
 {
     font-size: 0.875rem;
     color: var(--font-color-3);
-    
 }
 
 .paginator
@@ -338,7 +337,7 @@ a
     left: 0;
     bottom: -2px;
     width: 0;
-    height: 2px;
+    height: 4px;
     background-color: var(--font-color-0);
     animation: underlineAnimation 0.5s ease-in-out forwards;
     transform-origin: left;
@@ -451,100 +450,113 @@ a
 }
 
 .post-toc {
-    width: 300px;
     position: fixed;
-    right: calc((100% - 800px) / 2 - 340px);
     top: 100px;
-    max-height: calc(100vh - 200px);
-    overflow-y: auto;
-    padding: 20px;
-    background: #fafafa;
+    right: calc((100% - 800px) / 2 - 340px);
+    width: 300px;
+    max-height: calc(100vh - 120px);
+    background: var(--bg-color-1);
     border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     z-index: 100;
-    transition: all 0.3s ease;
-    scrollbar-width: thin;
-    scrollbar-color: var(--font-color-3) transparent;
-}
-
-.post-toc::-webkit-scrollbar {
-    width: 6px;
-}
-
-.post-toc::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.post-toc::-webkit-scrollbar-thumb {
-    background-color: var(--font-color-3);
-    border-radius: 3px;
+    display: flex;
+    flex-direction: column;
 }
 
 .toc-title {
     font-size: 1.2rem;
     font-weight: 600;
-    margin-bottom: 15px;
+    margin: 0;
+    padding: 20px 20px 10px;
     color: var(--font-color-1);
+    background: var(--bg-color-1);
+    border-radius: 8px 8px 0 0;
     position: sticky;
     top: 0;
-    background: #fafafa;
-    padding-bottom: 10px;
-    z-index: 1;
+    z-index: 2;
 }
 
 .toc-content {
-    font-size: 0.9rem;
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 20px 20px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--font-color-3) transparent;
+    max-height: calc(100vh - 180px);
+}
+
+.toc-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.toc-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.toc-content::-webkit-scrollbar-thumb {
+    background-color: var(--font-color-3);
+    border-radius: 3px;
+}
+
+.toc-content::-webkit-scrollbar-thumb:hover {
+    background-color: var(--font-color-2);
 }
 
 .toc-list {
     list-style: none;
-    padding-left: 0;
+    padding: 0;
     margin: 0;
+}
+
+.toc-list li {
+    margin: 4px 0;
+    line-height: 1.4;
+}
+
+.toc-list a {
+    color: var(--font-color-2);
+    text-decoration: none;
+    font-size: 14px;
+    display: block;
+    padding: 4px 8px 4px 10px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    border-left: 2px solid transparent;
+    margin-left: -10px;
+}
+
+.toc-list a:hover {
+    color: var(--font-color-0);
+    border-left-color: var(--font-color-0);
+    background: var(--bg-color-2);
+}
+
+.toc-list a.active {
+    color: var(--font-color-0);
+    border-left-color: var(--font-color-0);
+    background: var(--bg-color-2);
+    font-weight: 500;
 }
 
 .toc-sublist {
     list-style: none;
-    padding-left: 1.5em;
-    margin: 0.3em 0;
+    padding-left: 16px;
+    margin: 4px 0;
 }
 
-.toc-content li {
-    margin: 0.5em 0;
-    position: relative;
-}
-
-.toc-content li::before {
-    content: "";
-    position: absolute;
-    left: -1.2em;
-    top: 50%;
-    transform: translateY(-50%);
+.toc-sublist a {
+    font-size: 13px;
     color: var(--font-color-3);
-    font-weight: bold;
-}
-
-.toc-content a {
-    color: var(--font-color-2);
-    text-decoration: none;
-    transition: all 0.3s ease;
-    display: block;
-    padding: 0.2em 0;
+    padding: 4px 8px 4px 10px;
     border-left: 2px solid transparent;
-    padding-left: 10px;
+    margin-left: -10px;
 }
 
-.toc-content a:hover {
+.toc-sublist a:hover,
+.toc-sublist a.active {
     color: var(--font-color-0);
     border-left-color: var(--font-color-0);
-}
-
-.toc-content .active {
-    color: var(--font-color-0);
-    border-left-color: var(--font-color-0);
-    font-weight: 500;
-}
-
-.toc-content .active::before {
-    color: var(--font-color-0);
+    background: var(--bg-color-2);
 }
 
 @media screen and (max-width: 1200px) {
@@ -561,12 +573,15 @@ a
         border: 1px solid var(--line-1);
         margin-top: 40px;
     }
+
+    .toc-content {
+        max-height: none;
+    }
 }
 
 @media screen and (max-width: 768px) {
     .post-toc {
         margin: 20px 20px 0;
-        padding: 15px;
     }
 }
 

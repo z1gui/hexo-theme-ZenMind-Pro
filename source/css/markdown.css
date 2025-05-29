@@ -25,32 +25,13 @@
 .post-md h4::before,
 .post-md h5::before,
 .post-md h6::before {
-    content: "#";
     color: #e9e7e7;
     margin-right: 0.5em;
     transition: color 0.3s;
     cursor: pointer;
 }
 
-.post-md h2::before {
-    content: "##";
-}
 
-.post-md h3::before {
-    content: "###";
-}
-
-.post-md h4::before {
-    content: "####";
-}
-
-.post-md h5::before {
-    content: "#####";
-}
-
-.post-md h6::before {
-    content: "######";
-}
 
 .post-md h1:hover::before,
 .post-md h2:hover::before,
@@ -113,6 +94,7 @@
 .post-md strong
 {
     font-weight: 700;
+    border-bottom: 3px solid var(--font-color-0);
 }
 .post-md em
 {
@@ -139,8 +121,14 @@
 {
     border-radius: 4px;
     box-sizing: border-box;
-    padding: 5px 5px;
-    border: 1px solid #ebebeb;
+    border: none;
+    padding: 0;
+    cursor: zoom-in;
+    transition: transform 0.3s ease;
+}
+.post-md img:hover
+{
+    transform: scale(1.02);
 }
 .post-md hr
 {
@@ -158,7 +146,7 @@
 }
 .post-md blockquote
 {
-    border-left: 2px solid var(--line-2);
+    border-left: 2px solid var(--font-color-0);
     padding-left: 12px;
     word-wrap: break-word;
 }
@@ -209,10 +197,51 @@
     padding: 2px 4px;
     color: #f8f8f2;
     font-size: 1rem;
+    font-family: "JetBrains Mono","Montserrat", monospace;
+}
+
+.post-md pre code
+{
+    font-family: "JetBrains Mono","Montserrat", monospace;
+    font-size: 0.9rem;
+    font-style: italic;
+    line-height: 1.5;
+    padding: 1em;
+    display: block;
+    overflow-x: auto;
 }
 
 .post-md .hljs-ln-numbers
 {
     opacity: .5;
     padding-right: 12px;
+}
+
+/* 图片全屏显示模态框样式 */
+.image-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    cursor: zoom-out;
+}
+
+.image-modal img {
+    max-width: 90%;
+    max-height: 90%;
+    margin: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 4px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.image-modal.active {
+    display: block;
 }

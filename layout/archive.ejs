@@ -1,6 +1,6 @@
 <div class="archive-container">
     <div class="category-filter" style="display: none;">
-        <button class="category-btn active" data-category="all">全部(<%= site.posts.length %>)</button>
+        <button class="category-btn active" data-category="all">全部</button>
         <% site.categories.sort('name').each(function(category){ %>
             <button class="category-btn" data-category="<%= category.name %>"><%= category.name %> (<%= category.posts.length %>)</button>
         <% }); %>
