@@ -1,4 +1,7 @@
 <div class="post-main">
+    <!-- 阅读进度条 -->
+    <div class="reading-progress-bar" id="readingProgressBar"></div>
+    
     <% if (is_post()) { %>
         <div class="post-main-title">
             <%= page.title %>
@@ -19,8 +22,10 @@
             <div class="post-md">
                 <%- page.content %>
             </div>
-            <div class="post-toc">
-                <div class="toc-title">目录</div>
+            <div class="post-toc" id="postToc">
+                <div class="toc-header">
+                    <div class="toc-title">目录</div>
+                </div>
                 <div class="toc-content"></div>
             </div>
         </div>
@@ -66,6 +71,25 @@
     <img id="modalImage" src="" alt="全屏图片">
 </div>
 
+<!-- 代码全屏显示模态框 -->
+<div class="code-modal" id="codeModal">
+    <div class="code-modal-content">
+        <div class="code-modal-header">
+            <div class="code-modal-title">代码查看</div>
+            <div class="code-modal-close" id="codeModalClose">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+        </div>
+        <div class="code-modal-code">
+            <pre><code id="modalCode"></code></pre>
+        </div>
+    </div>
+</div>
+
+
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('imageModal');
@@ -96,6 +120,160 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.key === 'Escape' && modal.classList.contains('active')) {
             modal.classList.remove('active');
             document.body.style.overflow = '';
+        }
+    });
+
+    // 阅读进度条功能
+    const progressBar = document.getElementById('readingProgressBar');
+    if (progressBar) {
+        function updateReadingProgress() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / docHeight) * 100;
+            
+            // 限制进度条宽度在0-100%之间
+            const progressWidth = Math.min(Math.max(scrollPercent, 0), 100);
+            progressBar.style.width = progressWidth + '%';
+        }
+
+        // 监听滚动事件
+        window.addEventListener('scroll', updateReadingProgress);
+        
+        // 页面加载时初始化进度条
+        updateReadingProgress();
+    }
+
+
+
+    // 目录功能已移至工具栏统一管理
+
+    // 代码块全屏功能
+    const codeModal = document.getElementById('codeModal');
+    const modalCode = document.getElementById('modalCode');
+    const codeModalClose = document.getElementById('codeModalClose');
+
+    // 为所有代码块添加全屏按钮
+    const codeBlocks = document.querySelectorAll('.post-md pre');
+    codeBlocks.forEach(pre => {
+        // 检查是否已经有按钮（避免重复添加）
+        if (!pre.querySelector('.code-fullscreen-btn')) {
+            const fullscreenBtn = document.createElement('div');
+            fullscreenBtn.className = 'code-fullscreen-btn';
+            fullscreenBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 3H5C3.89543 3 3 3.89543 3 5V8M21 8V5C21 3.89543 20.1046 3 19 3H16M16 21H19C20.1046 21 21 20.1046 21 19V16M3 16V19C3 20.1046 3.89543 21 5 21H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            `;
+            fullscreenBtn.title = '全屏查看代码';
+            
+            // 点击按钮显示全屏代码
+            fullscreenBtn.addEventListener('click', function() {
+                const codeElement = pre.querySelector('code');
+                if (codeElement) {
+                    // 检查是否是已经应用了行号的代码块
+                    const hljsTable = pre.querySelector('table.hljs-ln');
+                    
+                    let codeContent;
+                    let startLineNumber = 1;
+                    
+                    if (hljsTable) {
+                        // 如果有行号表格，提取纯代码内容和起始行号
+                        const codeLines = hljsTable.querySelectorAll('.hljs-ln-code');
+                        codeContent = Array.from(codeLines).map(line => {
+                            // 提取每行的文本内容，保持原始格式
+                            return line.textContent || line.innerText || ' ';
+                        }).join('\n');
+                        
+                        // 获取起始行号
+                        const firstNumberCell = hljsTable.querySelector('.hljs-ln-numbers');
+                        if (firstNumberCell) {
+                            const lineAttr = firstNumberCell.getAttribute('data-line-number');
+                            if (lineAttr) {
+                                startLineNumber = parseInt(lineAttr) || 1;
+                            }
+                        }
+                    } else {
+                        // 普通代码块，直接获取文本内容
+                        codeContent = codeElement.textContent || codeElement.innerText;
+                    }
+                    
+                    const codeLanguage = getCodeLanguage(codeElement);
+                    
+                    // 设置模态框中的代码内容
+                    modalCode.textContent = codeContent;
+                    modalCode.className = codeElement.className; // 保持代码高亮的类名
+                    
+                    // 如果原代码有自定义起始行号，设置data属性
+                    if (startLineNumber !== 1) {
+                        modalCode.setAttribute('data-ln-start-from', startLineNumber);
+                    } else {
+                        modalCode.removeAttribute('data-ln-start-from');
+                    }
+                    
+                    // 更新标题
+                    const modalTitle = document.querySelector('.code-modal-title');
+                    if (codeLanguage) {
+                        modalTitle.textContent = `代码查看 - ${codeLanguage}`;
+                    } else {
+                        modalTitle.textContent = '代码查看';
+                    }
+                    
+                    // 显示模态框
+                    codeModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                    
+                    // 重新应用代码高亮和行号
+                    if (typeof hljs !== 'undefined') {
+                        hljs.highlightElement(modalCode);
+                        
+                        // 应用行号
+                        if (typeof hljs.lineNumbersBlock !== 'undefined') {
+                            hljs.lineNumbersBlock(modalCode, {
+                                startFrom: startLineNumber
+                            });
+                        }
+                    }
+                }
+            });
+            
+            pre.appendChild(fullscreenBtn);
+        }
+    });
+
+    // 获取代码语言
+    function getCodeLanguage(codeElement) {
+        const className = codeElement.className;
+        const languageMatch = className.match(/language-(\w+)|hljs-(\w+)|\b(\w+)$/);
+        if (languageMatch) {
+            return languageMatch[1] || languageMatch[2] || languageMatch[3];
+        }
+        return '';
+    }
+
+    // 关闭代码全屏模态框
+    function closeCodeModal() {
+        codeModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // 点击关闭按钮
+    if (codeModalClose) {
+        codeModalClose.addEventListener('click', closeCodeModal);
+    }
+
+    // 点击模态框背景关闭（点击内容区域不关闭）
+    codeModal.addEventListener('click', function(e) {
+        if (e.target === codeModal) {
+            closeCodeModal();
+        }
+    });
+
+    // 按 ESC 键关闭代码模态框
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            if (codeModal.classList.contains('active')) {
+                closeCodeModal();
+            }
         }
     });
 });

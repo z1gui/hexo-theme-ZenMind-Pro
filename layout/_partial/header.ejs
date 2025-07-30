@@ -1,9 +1,32 @@
 <div class="header">
     <!-- <a class="logo" href="<%- url_for() %>"><%= config.title %></a> -->
-    <div class="logo"><a href="/" title="z1gui"><img src="/img/favicon.png" alt="z1gui" aria-label="logo" height="80"></a></div>
+    <!-- <div class="logo"><a href="/" title="z1gui"><img src="/img/favicon.png" alt="z1gui" aria-label="logo" height="60" ></a></div> -->
+    <!-- <div class="typewriter-container">
+        <span class="typewriter-text" id="typewriter"></span>
+        <span class="cursor">|</span>
+    </div> -->
     <ul class="nav">
         <% for (name in theme.menu) { %>
-        <li><a href="<%- url_for(theme.menu[name]) %>"><%= name %></a></li>
+        <li>
+            <% 
+            let isCurrent = false;
+            const menuPath = theme.menu[name];
+            
+            // 判断当前页面
+            if (menuPath === '/') {
+                isCurrent = is_home();
+            } else if (menuPath === '/archives') {
+                isCurrent = is_archive();
+            } else if (menuPath === '/about') {
+                isCurrent = page.path.startsWith('about');
+            } else if (menuPath === '/use') {
+                isCurrent = page.path.startsWith('use');
+            } else if (menuPath === '/novel') {
+                isCurrent = page.path.startsWith('novel');
+            }
+            %>
+            <a href="<%- url_for(menuPath) %>" class="<%= isCurrent ? 'current' : '' %>"><%= name %></a>
+        </li>
         <% } %>
     </ul>
 </div>
